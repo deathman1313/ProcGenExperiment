@@ -22,11 +22,7 @@ void ASpawnArea::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for (int i = 0; i < 5; i++)
-	{
-		FTransform Position = FindPosition();
-		AGameObject* Test = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
-	}
+	SetRandomness(1);
 }
 
 // Called every frame
@@ -36,11 +32,31 @@ void ASpawnArea::Tick(float DeltaTime)
 
 }
 
+void ASpawnArea::SetRandomness(int Seed)
+{
+	// Sets random stream seed
+	RandomGenerator = FRandomStream(Seed);
+
+	// Destroys all currently spawned objects
+	for (int i = 0; i < Objects.Num() - 1; i++)
+	{
+		Objects[i]->Destroy();
+	}
+	Objects.Empty();
+
+	// Spawns new objects
+	for (int i = 0; i < 5; i++)
+	{
+		FTransform Position = FindPosition();
+		AGameObject* Test = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+	}
+}
+
 FTransform ASpawnArea::FindPosition() 
 {
 	//Find random location in 2D space
-	float PosX = UKismetMathLibrary::RandomFloatInRange(Area->GetRelativeLocation().X - Area->GetScaledBoxExtent().X, Area->GetRelativeLocation().X + Area->GetScaledBoxExtent().X);
-	float PosY = UKismetMathLibrary::RandomFloatInRange(Area->GetRelativeLocation().Y - Area->GetScaledBoxExtent().Y, Area->GetRelativeLocation().Y + Area->GetScaledBoxExtent().Y);
+	float PosX = RandomGenerator.FRandRange(Area->GetRelativeLocation().X - Area->GetScaledBoxExtent().X, Area->GetRelativeLocation().X + Area->GetScaledBoxExtent().X);
+	float PosY = RandomGenerator.FRandRange(Area->GetRelativeLocation().Y - Area->GetScaledBoxExtent().Y, Area->GetRelativeLocation().Y + Area->GetScaledBoxExtent().Y);
 
 	//Find location on surface
 	FHitResult LandscapePointData;

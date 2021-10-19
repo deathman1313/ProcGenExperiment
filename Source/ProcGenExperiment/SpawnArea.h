@@ -21,13 +21,22 @@ public:
 	class UBoxComponent* Area;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FRandomStream RandomGenerator;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APlayerSpawnLocation* PlayerStart;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AGameObject*> Objects;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AGameObject> ObjectToSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	AActor* NavMesh;
+
+	UFUNCTION(BlueprintCallable)
+	void SetRandomness(int Seed);
 
 	UFUNCTION(BlueprintCallable)
 	FTransform FindPosition();
