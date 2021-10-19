@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "PlayerSpawnLocation.h"
 #include "GameObject.h"
-#include "DangerZone.h"
 #include "SpawnArea.generated.h"
 
 UCLASS()
@@ -26,9 +25,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	APlayerSpawnLocation* PlayerStart;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<ADangerZone*> DangerZones;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<AGameObject*> Objects;

@@ -15,12 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	APlayerSpawnLocation();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UStaticMeshComponent* Cube;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USceneComponent* ViewPoint;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

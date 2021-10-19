@@ -26,12 +26,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EObjectType Type;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UStaticMeshComponent* Cube;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class USceneComponent* ViewPoint;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
