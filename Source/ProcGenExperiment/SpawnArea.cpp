@@ -4,6 +4,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameObject.h"
 #include "SpawnArea.h"
+#include "NavigationSystem.h"
 
 // Sets default values
 ASpawnArea::ASpawnArea()
@@ -35,12 +36,24 @@ void ASpawnArea::Tick(float DeltaTime)
 
 }
 
-FTransform ASpawnArea::FindPosition() {
-	//UE_LOG(LogTemp, Warning, TEXT("Test"));
+FTransform ASpawnArea::FindPosition() 
+{
+	//Find random location in 2D space
 	float PosX = UKismetMathLibrary::RandomFloatInRange(Area->GetRelativeLocation().X - Area->GetScaledBoxExtent().X, Area->GetRelativeLocation().X + Area->GetScaledBoxExtent().X);
 	float PosY = UKismetMathLibrary::RandomFloatInRange(Area->GetRelativeLocation().Y - Area->GetScaledBoxExtent().Y, Area->GetRelativeLocation().Y + Area->GetScaledBoxExtent().Y);
 
+	//Find location on surface
 	FHitResult LandscapePointData;
 	GetWorld()->LineTraceSingleByChannel(LandscapePointData, FVector(PosX, PosY, Area->GetRelativeLocation().Z + Area->GetScaledBoxExtent().Z), FVector(PosX, PosY, Area->GetRelativeLocation().Z - Area->GetScaledBoxExtent().Z), ECC_WorldStatic);
-	return(FTransform(FVector(PosX, PosY, LandscapePointData.Location.Z)));
+	
+	// Calaculate Rotator
+	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(FVector(0.f, 0.f, 0.f), LandscapePointData.Normal);
+	return(FTransform(FRotator(Rotation.Pitch - 90.f, Rotation.Yaw, Rotation.Roll), FVector(PosX, PosY, LandscapePointData.Location.Z)));
+}
+
+bool ASpawnArea::IsNavigable() 
+{
+	UNavigationPath* Test;
+	Test = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), FVector(), FVector(), NavMesh);
+	return(true);
 }

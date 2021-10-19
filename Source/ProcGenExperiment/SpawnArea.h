@@ -26,8 +26,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AGameObject> ObjectToSpawn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AActor* NavMesh;
+
 	UFUNCTION(BlueprintCallable)
 	FTransform FindPosition();
+
+	UFUNCTION(BlueprintCallable)
+	bool IsNavigable();
 
 protected:
 	// Called when the game starts or when spawned
