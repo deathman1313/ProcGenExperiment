@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PlayerSpawnLocation.h"
 #include "GameObject.h"
+#include "DangerZone.h"
 #include "SpawnArea.generated.h"
 
 UCLASS()
@@ -18,31 +19,34 @@ public:
 	ASpawnArea();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UBoxComponent* Area;
+		class UBoxComponent* Area;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FRandomStream RandomGenerator;
+		FRandomStream RandomGenerator;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	APlayerSpawnLocation* PlayerStart;
+		APlayerSpawnLocation* PlayerStart;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<AGameObject*> Objects;
+		TArray<AGameObject*> Objects;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TSubclassOf<AGameObject> ObjectToSpawn;
+		TSubclassOf<AGameObject> ObjectToSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AActor* NavMesh;
+		TArray<ADangerZone*> DangerZones;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		AActor* NavMesh;
 
 	UFUNCTION(BlueprintCallable)
-	void SetRandomness(int Seed);
+		void SetRandomness(int Seed);
 
 	UFUNCTION(BlueprintCallable)
-	FTransform FindPosition();
+		FTransform FindPosition();
 
 	UFUNCTION(BlueprintCallable)
-	bool IsNavigable();
+		bool IsNavigable();
 
 protected:
 	// Called when the game starts or when spawned

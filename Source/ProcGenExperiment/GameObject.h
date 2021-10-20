@@ -24,7 +24,13 @@ public:
 	AGameObject();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EObjectType Type;
+		EObjectType Type;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class UStaticMeshComponent* Cube;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		class USceneComponent* ViewPoint;
 
 protected:
 	// Called when the game starts or when spawned

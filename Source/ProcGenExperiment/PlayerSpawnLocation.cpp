@@ -9,6 +9,11 @@ APlayerSpawnLocation::APlayerSpawnLocation()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	Cube = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Cube"));
+	Cube->SetCanEverAffectNavigation(false);
+
+	ViewPoint = CreateDefaultSubobject<USceneComponent>(TEXT("ViewPoint"));
+	ViewPoint->ComponentTags.Add(FName("ViewPoint"));
 }
 
 // Called when the game starts or when spawned
