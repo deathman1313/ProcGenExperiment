@@ -52,7 +52,16 @@ public:
 		bool InZone(FVector Location, EObjectType Type);
 
 	UFUNCTION(BlueprintCallable)
-		bool IsNavigable(TArray<AActor*> StartPoints, FVector Location);
+		bool IsDistanced(FVector Location);
+
+	UFUNCTION(BlueprintCallable)
+		bool InDanger(FVector Location);
+
+	UFUNCTION(BlueprintCallable)
+		bool InSight(FVector Location, TArray<AActor*> ViewPoints);
+
+	UFUNCTION(BlueprintCallable)
+		bool IsNavigable(FVector Location, TArray<AActor*> StartPoints);
 
 protected:
 	// Called when the game starts or when spawned

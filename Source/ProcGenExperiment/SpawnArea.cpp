@@ -38,9 +38,9 @@ void ASpawnArea::SetRandomness(int Seed)
 	RandomGenerator = FRandomStream(Seed);
 
 	// Destroys all currently spawned objects
-	for (int i = 0; i < Objects.Num(); i++)
+	for (AGameObject* Obj : Objects)
 	{
-		Objects[i]->Destroy();
+		Obj->Destroy();
 	}
 	Objects.Empty();
 
@@ -54,7 +54,8 @@ void ASpawnArea::SetRandomness(int Seed)
 			Position = FindPosition();
 			bValidPosition = IsPositionValid(Position, EObjectType::Tier1);
 		}
-		AGameObject* Test = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		Objects.Add(NewObj);
 	}
 }
 
@@ -75,7 +76,18 @@ FTransform ASpawnArea::FindPosition()
 
 bool ASpawnArea::IsPositionValid(FTransform Position, EObjectType Type)
 {
-	return(InZone(Position.GetLocation(), Type));
+	// This is for testing
+	TArray<AActor*> Temp;
+	Temp.Add(PlayerStart);
+	/*
+	for (AGameObject* Obj : Objects)
+	{
+		Temp.Add(Obj);
+	}
+	*/
+
+	// This is also just for testing
+	return(InZone(Position.GetLocation(), Type) && IsDistanced(Position.GetLocation()) && InSight(Position.GetLocation(), Temp));
 }
 
 bool ASpawnArea::InZone(FVector Location, EObjectType Type)
@@ -85,7 +97,7 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 	switch (Type)
 	{
 	case EObjectType::Tier1:
-		if (Distance < 1000)
+		if (Distance < 7500)
 		{
 			return(true);
 		} 
@@ -94,7 +106,7 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 			return(false);
 		}
 	case EObjectType::Tier2:
-		if (Distance > 1000 && Distance < 2000)
+		if (Distance > 7500 && Distance < 15000)
 		{
 			return(true);
 		}
@@ -103,7 +115,7 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 			return(false);
 		}
 	case EObjectType::Tier3:
-		if (Distance > 2000 && Distance < 3000)
+		if (Distance > 15000 && Distance < 25000)
 		{
 			return(true);
 		}
@@ -116,12 +128,63 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 	}
 }
 
-bool ASpawnArea::IsNavigable(TArray<AActor*> StartPoints, FVector Location)
+bool ASpawnArea::IsDistanced(FVector Location) 
 {
-	for (int i = 0; i < StartPoints.Num(); i++)
+	for (AGameObject* Obj : Objects)
+	{
+		if (FVector::Dist(Obj->GetActorLocation(), Location) <= 2500)
+		{
+			return(false);
+		}
+	}
+	return(true);
+}
+
+bool ASpawnArea::InDanger(FVector Location)
+{
+	return(true);
+}
+
+bool ASpawnArea::InSight(FVector Location, TArray<AActor*> ViewPoints)
+{
+	FVector StartLocation;
+
+	for (AActor* Actor : ViewPoints)
+	{
+		// Check for View Point
+		TArray<UActorComponent*> Components = Actor->GetComponentsByTag(USceneComponent::StaticClass(), FName("ViewPoint"));
+		if (Components[0])
+		{
+			if (Components[0]->IsA<USceneComponent>())
+			{
+				// Find location of View Point
+				StartLocation = CastChecked<USceneComponent>(Components[0])->GetComponentLocation();
+			}
+			// If no View Point found, use actor location
+			else
+			{
+				StartLocation = Actor->GetActorLocation();
+			}
+		}
+		else
+		{
+			StartLocation = Actor->GetActorLocation();
+		}
+		// Check line of sight
+		FHitResult LandscapePointData;
+		GetWorld()->LineTraceSingleByChannel(LandscapePointData, StartLocation, Location, ECC_WorldStatic);
+		// This doesn't work
+		return(!LandscapePointData.IsValidBlockingHit());
+	}
+	return(true);
+}
+
+bool ASpawnArea::IsNavigable(FVector Location, TArray<AActor*> StartPoints)
+{
+	for (AActor* Actor : StartPoints)
 	{
 		UNavigationPath* Test;
-		Test = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), StartPoints[i]->GetActorLocation(), Location, NavMesh);
+		Test = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), Actor->GetActorLocation(), Location, NavMesh);
 	}
 	return(true);
 }
