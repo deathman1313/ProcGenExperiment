@@ -46,7 +46,13 @@ public:
 		FTransform FindPosition();
 
 	UFUNCTION(BlueprintCallable)
-		bool IsNavigable();
+		bool IsPositionValid(FTransform Position, EObjectType Type);
+
+	UFUNCTION(BlueprintCallable)
+		bool InZone(FVector Location, EObjectType Type);
+
+	UFUNCTION(BlueprintCallable)
+		bool IsNavigable(TArray<AActor*> StartPoints, FVector Location);
 
 protected:
 	// Called when the game starts or when spawned

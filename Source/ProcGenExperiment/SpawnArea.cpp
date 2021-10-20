@@ -38,7 +38,7 @@ void ASpawnArea::SetRandomness(int Seed)
 	RandomGenerator = FRandomStream(Seed);
 
 	// Destroys all currently spawned objects
-	for (int i = 0; i < Objects.Num() - 1; i++)
+	for (int i = 0; i < Objects.Num(); i++)
 	{
 		Objects[i]->Destroy();
 	}
@@ -47,7 +47,13 @@ void ASpawnArea::SetRandomness(int Seed)
 	// Spawns new objects
 	for (int i = 0; i < 5; i++)
 	{
-		FTransform Position = FindPosition();
+		FTransform Position;
+		bool bValidPosition = false;
+		while (!bValidPosition)
+		{
+			Position = FindPosition();
+			bValidPosition = IsPositionValid(Position, EObjectType::Tier1);
+		}
 		AGameObject* Test = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
 	}
 }
@@ -67,9 +73,55 @@ FTransform ASpawnArea::FindPosition()
 	return(FTransform(FRotator(Rotation.Pitch - 90.f, Rotation.Yaw, Rotation.Roll), FVector(PosX, PosY, LandscapePointData.Location.Z)));
 }
 
-bool ASpawnArea::IsNavigable() 
+bool ASpawnArea::IsPositionValid(FTransform Position, EObjectType Type)
 {
-	UNavigationPath* Test;
-	Test = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), FVector(), FVector(), NavMesh);
+	return(InZone(Position.GetLocation(), Type));
+}
+
+bool ASpawnArea::InZone(FVector Location, EObjectType Type)
+{
+	float Distance = FVector::Dist(PlayerStart->GetActorLocation(), Location);
+
+	switch (Type)
+	{
+	case EObjectType::Tier1:
+		if (Distance < 1000)
+		{
+			return(true);
+		} 
+		else 
+		{
+			return(false);
+		}
+	case EObjectType::Tier2:
+		if (Distance > 1000 && Distance < 2000)
+		{
+			return(true);
+		}
+		else 
+		{
+			return(false);
+		}
+	case EObjectType::Tier3:
+		if (Distance > 2000 && Distance < 3000)
+		{
+			return(true);
+		}
+		else
+		{
+			return(false);
+		}
+	default:
+		return(true);
+	}
+}
+
+bool ASpawnArea::IsNavigable(TArray<AActor*> StartPoints, FVector Location)
+{
+	for (int i = 0; i < StartPoints.Num(); i++)
+	{
+		UNavigationPath* Test;
+		Test = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), StartPoints[i]->GetActorLocation(), Location, NavMesh);
+	}
 	return(true);
 }
