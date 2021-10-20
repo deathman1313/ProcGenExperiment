@@ -47,12 +47,19 @@ void ASpawnArea::SetRandomness(int Seed)
 	// Spawns new objects
 	for (int i = 0; i < 5; i++)
 	{
+		int Insurance = 0;
 		FTransform Position;
 		bool bValidPosition = false;
 		while (!bValidPosition)
 		{
 			Position = FindPosition();
 			bValidPosition = IsPositionValid(Position, EObjectType::Tier1);
+			Insurance++;
+			if (Insurance > 100)
+			{
+				bValidPosition = true;
+				UE_LOG(LogTemp, Warning, TEXT("Borked"));
+			}
 		}
 		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
 		Objects.Add(NewObj);
@@ -67,7 +74,7 @@ FTransform ASpawnArea::FindPosition()
 
 	//Find location on surface
 	FHitResult LandscapePointData;
-	GetWorld()->LineTraceSingleByChannel(LandscapePointData, FVector(PosX, PosY, Area->GetRelativeLocation().Z + Area->GetScaledBoxExtent().Z), FVector(PosX, PosY, Area->GetRelativeLocation().Z - Area->GetScaledBoxExtent().Z), ECC_WorldStatic);
+	GetWorld()->LineTraceSingleByChannel(LandscapePointData, FVector(PosX, PosY, Area->GetRelativeLocation().Z + Area->GetScaledBoxExtent().Z), FVector(PosX, PosY, Area->GetRelativeLocation().Z - Area->GetScaledBoxExtent().Z), ECC_GameTraceChannel1);
 	
 	// Calaculate Rotator
 	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(FVector(0.f, 0.f, 0.f), LandscapePointData.Normal);
@@ -172,9 +179,8 @@ bool ASpawnArea::InSight(FVector Location, TArray<AActor*> ViewPoints)
 		}
 		// Check line of sight
 		FHitResult LandscapePointData;
-		GetWorld()->LineTraceSingleByChannel(LandscapePointData, StartLocation, Location, ECC_WorldStatic);
-		// This doesn't work
-		return(!LandscapePointData.IsValidBlockingHit());
+		FVector EndLocation = (UKismetMathLibrary::GetDirectionUnitVector(Location, StartLocation) * 5) + Location;
+		return(!GetWorld()->LineTraceSingleByChannel(LandscapePointData, StartLocation, EndLocation, ECC_GameTraceChannel1));
 	}
 	return(true);
 }
