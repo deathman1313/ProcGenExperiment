@@ -147,7 +147,7 @@ bool ASpawnArea::IsDistanced(FVector Location)
 	return(true);
 }
 
-bool ASpawnArea::InDanger(FVector Location)
+bool ASpawnArea::InDanger(FVector Location, EObjectType Type)
 {
 	return(true);
 }

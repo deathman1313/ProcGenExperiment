@@ -55,7 +55,7 @@ public:
 		bool IsDistanced(FVector Location);
 
 	UFUNCTION(BlueprintCallable)
-		bool InDanger(FVector Location);
+		bool InDanger(FVector Location, EObjectType Type);
 
 	UFUNCTION(BlueprintCallable)
 		bool InSight(FVector Location, TArray<AActor*> ViewPoints);
