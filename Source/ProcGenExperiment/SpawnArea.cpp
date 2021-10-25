@@ -3,8 +3,9 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameObject.h"
-#include "SpawnArea.h"
+#include "Blueprint/UserWidget.h"
 #include "NavigationSystem.h"
+#include "SpawnArea.h"
 
 // Sets default values
 ASpawnArea::ASpawnArea()
@@ -22,7 +23,9 @@ void ASpawnArea::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetRandomness(1);
+	UUserWidget* Test;
+	Test = CreateWidget<UUserWidget>(GetWorld(), GenMenuClass, FName());
+	Test->AddToViewport();
 }
 
 // Called every frame

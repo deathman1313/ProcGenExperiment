@@ -25,6 +25,9 @@ public:
 		FRandomStream RandomGenerator;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<UUserWidget> GenMenuClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		APlayerSpawnLocation* PlayerStart;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
