@@ -4,6 +4,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameObject.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/SphereComponent.h"
 #include "NavigationSystem.h"
 #include "SpawnArea.h"
 
@@ -152,6 +153,14 @@ bool ASpawnArea::IsDistanced(FVector Location)
 
 bool ASpawnArea::InDanger(FVector Location, EObjectType Type)
 {
+	for (ADangerZone* Zone : DangerZones) 
+	{
+		// Check Danger level here
+		if (FVector::Dist(Zone->GetActorLocation(), Location) < Zone->Area->GetScaledSphereRadius())
+		{
+			return(false);
+		}
+	}
 	return(true);
 }
 
