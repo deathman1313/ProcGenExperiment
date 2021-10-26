@@ -39,9 +39,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<ADangerZone*> DangerZones;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		AActor* NavMesh;
-
 	UFUNCTION(BlueprintCallable)
 		void SetRandomness(int Seed);
 

@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/SphereComponent.h"
 #include "NavigationSystem.h"
+#include "NavigationPath.h"
 #include "SpawnArea.h"
 
 // Sets default values
@@ -192,17 +193,27 @@ bool ASpawnArea::InSight(FVector Location, TArray<AActor*> ViewPoints)
 		// Check line of sight
 		FHitResult LandscapePointData;
 		FVector EndLocation = (UKismetMathLibrary::GetDirectionUnitVector(Location, StartLocation) * 5) + Location;
-		return(!GetWorld()->LineTraceSingleByChannel(LandscapePointData, StartLocation, EndLocation, ECC_GameTraceChannel1));
+		if (!GetWorld()->LineTraceSingleByChannel(LandscapePointData, StartLocation, EndLocation, ECC_GameTraceChannel1))
+		{
+			return(true);
+		}
 	}
-	return(true);
+	return(false);
 }
 
 bool ASpawnArea::IsNavigable(FVector Location, TArray<AActor*> StartPoints)
 {
 	for (AActor* Actor : StartPoints)
 	{
-		UNavigationPath* Test;
-		Test = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), Actor->GetActorLocation(), Location, NavMesh);
+		UNavigationPath* Path;
+		Path = UNavigationSystemV1::FindPathToLocationSynchronously(GetWorld(), Actor->GetActorLocation(), Location);
+		if (Path->IsValid())
+		{
+			if (!Path->IsPartial())
+			{
+				return(true);
+			}
+		}
 	}
-	return(true);
+	return(false);
 }
