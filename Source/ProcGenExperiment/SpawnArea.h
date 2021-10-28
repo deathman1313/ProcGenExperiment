@@ -9,6 +9,58 @@
 #include "DangerZone.h"
 #include "SpawnArea.generated.h"
 
+USTRUCT(BlueprintType)
+struct FGenerationSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Seed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Tier1Amt = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Tier1ZoneMin = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Tier1ZoneMax = 7500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Tier2Amt = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Tier2ZoneMin = 7500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Tier2ZoneMax = 15000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Tier3Amt = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Tier3ZoneMin = 15000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float Tier3ZoneMax = 25000;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsZoningEnabled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsDistancingEnabled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsDangerEnabled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsSightEnabled;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsNavigationEnabled;
+};
+
+
 UCLASS()
 class PROCGENEXPERIMENT_API ASpawnArea : public AActor
 {
@@ -28,6 +80,9 @@ public:
 		TSubclassOf<UUserWidget> GenMenuClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FGenerationSettings Settings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		APlayerSpawnLocation* PlayerStart;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -40,7 +95,10 @@ public:
 		TArray<ADangerZone*> DangerZones;
 
 	UFUNCTION(BlueprintCallable)
-		void SetRandomness(int Seed);
+		void SetRandomness();
+
+	UFUNCTION(BlueprintCallable)
+		void SpawnObjects();
 
 	UFUNCTION(BlueprintCallable)
 		FTransform FindPosition();

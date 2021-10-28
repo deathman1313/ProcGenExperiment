@@ -37,10 +37,12 @@ void ASpawnArea::Tick(float DeltaTime)
 
 }
 
-void ASpawnArea::SetRandomness(int Seed)
+void ASpawnArea::SetRandomness()
 {
+
+	UE_LOG(LogTemp, Warning, TEXT("%d"), Settings.Seed);
 	// Sets random stream seed
-	RandomGenerator = FRandomStream(Seed);
+	RandomGenerator = FRandomStream(Settings.Seed);
 
 	// Destroys all currently spawned objects
 	for (AGameObject* Obj : Objects)
@@ -50,7 +52,12 @@ void ASpawnArea::SetRandomness(int Seed)
 	Objects.Empty();
 
 	// Spawns new objects
-	for (int i = 0; i < 5; i++)
+	SpawnObjects();
+}
+
+void ASpawnArea::SpawnObjects()
+{
+	for (int i = 0; i < Settings.Tier1Amt; i++)
 	{
 		int Insurance = 0;
 		FTransform Position;
@@ -59,6 +66,44 @@ void ASpawnArea::SetRandomness(int Seed)
 		{
 			Position = FindPosition();
 			bValidPosition = IsPositionValid(Position, EObjectType::Tier1);
+			Insurance++;
+			if (Insurance > 100)
+			{
+				bValidPosition = true;
+				UE_LOG(LogTemp, Warning, TEXT("Borked"));
+			}
+		}
+		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		Objects.Add(NewObj);
+	}
+	for (int i = 0; i < Settings.Tier2Amt; i++)
+	{
+		int Insurance = 0;
+		FTransform Position;
+		bool bValidPosition = false;
+		while (!bValidPosition)
+		{
+			Position = FindPosition();
+			bValidPosition = IsPositionValid(Position, EObjectType::Tier2);
+			Insurance++;
+			if (Insurance > 100)
+			{
+				bValidPosition = true;
+				UE_LOG(LogTemp, Warning, TEXT("Borked"));
+			}
+		}
+		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		Objects.Add(NewObj);
+	}
+	for (int i = 0; i < Settings.Tier3Amt; i++)
+	{
+		int Insurance = 0;
+		FTransform Position;
+		bool bValidPosition = false;
+		while (!bValidPosition)
+		{
+			Position = FindPosition();
+			bValidPosition = IsPositionValid(Position, EObjectType::Tier3);
 			Insurance++;
 			if (Insurance > 100)
 			{
@@ -109,7 +154,7 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 	switch (Type)
 	{
 	case EObjectType::Tier1:
-		if (Distance < 7500)
+		if (Distance >= Settings.Tier1ZoneMin && Distance <= Settings.Tier1ZoneMax)
 		{
 			return(true);
 		} 
@@ -118,7 +163,7 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 			return(false);
 		}
 	case EObjectType::Tier2:
-		if (Distance > 7500 && Distance < 15000)
+		if (Distance >= Settings.Tier2ZoneMin && Distance <= Settings.Tier2ZoneMax)
 		{
 			return(true);
 		}
@@ -127,7 +172,7 @@ bool ASpawnArea::InZone(FVector Location, EObjectType Type)
 			return(false);
 		}
 	case EObjectType::Tier3:
-		if (Distance > 15000 && Distance < 25000)
+		if (Distance >= Settings.Tier3ZoneMin && Distance <= Settings.Tier3ZoneMax)
 		{
 			return(true);
 		}
