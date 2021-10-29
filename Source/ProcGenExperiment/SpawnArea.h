@@ -18,7 +18,7 @@ struct FGenerationSettings
 		int Seed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Attempts;
+		int Attempts = 100;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int Tier1Amt = 1;
