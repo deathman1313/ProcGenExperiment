@@ -18,7 +18,19 @@ struct FGenerationSettings
 		int Seed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Attempts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int Tier1Amt = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Tier2Amt = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int Tier3Amt = 1;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool bIsZoningEnabled;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Tier1ZoneMin = 0;
@@ -27,16 +39,10 @@ struct FGenerationSettings
 		float Tier1ZoneMax = 7500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Tier2Amt = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Tier2ZoneMin = 7500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Tier2ZoneMax = 15000;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int Tier3Amt = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float Tier3ZoneMin = 15000;
@@ -45,10 +51,10 @@ struct FGenerationSettings
 		float Tier3ZoneMax = 25000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool bIsZoningEnabled;
+		bool bIsDistancingEnabled;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		bool bIsDistancingEnabled;
+		float Distance = 2500.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bIsDangerEnabled;
@@ -113,7 +119,7 @@ public:
 		bool IsDistanced(FVector Location);
 
 	UFUNCTION(BlueprintCallable)
-		bool InDanger(FVector Location, EObjectType Type);
+		bool NotInDanger(FVector Location, EObjectType Type);
 
 	UFUNCTION(BlueprintCallable)
 		bool InSight(FVector Location, TArray<AActor*> ViewPoints);

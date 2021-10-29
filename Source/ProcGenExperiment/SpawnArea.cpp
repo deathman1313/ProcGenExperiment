@@ -40,7 +40,7 @@ void ASpawnArea::Tick(float DeltaTime)
 void ASpawnArea::SetRandomness()
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("%d"), Settings.Seed);
+	//UE_LOG(LogTemp, Warning, TEXT("%d"), Settings.Seed);
 	// Sets random stream seed
 	RandomGenerator = FRandomStream(Settings.Seed);
 
@@ -67,13 +67,15 @@ void ASpawnArea::SpawnObjects()
 			Position = FindPosition();
 			bValidPosition = IsPositionValid(Position, EObjectType::Tier1);
 			Insurance++;
-			if (Insurance > 100)
+			if (Insurance > Settings.Attempts)
 			{
 				bValidPosition = true;
 				UE_LOG(LogTemp, Warning, TEXT("Borked"));
 			}
 		}
+		// Create Object
 		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		NewObj->Type = EObjectType::Tier1;
 		Objects.Add(NewObj);
 	}
 	for (int i = 0; i < Settings.Tier2Amt; i++)
@@ -86,13 +88,15 @@ void ASpawnArea::SpawnObjects()
 			Position = FindPosition();
 			bValidPosition = IsPositionValid(Position, EObjectType::Tier2);
 			Insurance++;
-			if (Insurance > 100)
+			if (Insurance > Settings.Attempts)
 			{
 				bValidPosition = true;
 				UE_LOG(LogTemp, Warning, TEXT("Borked"));
 			}
 		}
+		// Create Object
 		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		NewObj->Type = EObjectType::Tier2;
 		Objects.Add(NewObj);
 	}
 	for (int i = 0; i < Settings.Tier3Amt; i++)
@@ -105,13 +109,15 @@ void ASpawnArea::SpawnObjects()
 			Position = FindPosition();
 			bValidPosition = IsPositionValid(Position, EObjectType::Tier3);
 			Insurance++;
-			if (Insurance > 100)
+			if (Insurance > Settings.Attempts)
 			{
 				bValidPosition = true;
 				UE_LOG(LogTemp, Warning, TEXT("Borked"));
 			}
 		}
+		// Create Object
 		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+		NewObj->Type = EObjectType::Tier3;
 		Objects.Add(NewObj);
 	}
 }
@@ -133,18 +139,90 @@ FTransform ASpawnArea::FindPosition()
 
 bool ASpawnArea::IsPositionValid(FTransform Position, EObjectType Type)
 {
-	// This is for testing
-	TArray<AActor*> Temp;
-	Temp.Add(PlayerStart);
-	/*
-	for (AGameObject* Obj : Objects)
+	// Check if constraints are enabled
+	if (Settings.bIsZoningEnabled)
 	{
-		Temp.Add(Obj);
+		if (!InZone(Position.GetLocation(), Type))
+		{
+			return(false);
+		}
 	}
-	*/
-
-	// This is also just for testing
-	return(InZone(Position.GetLocation(), Type) && IsDistanced(Position.GetLocation()) && InSight(Position.GetLocation(), Temp));
+	if (Settings.bIsDistancingEnabled)
+	{
+		if (!IsDistanced(Position.GetLocation()))
+		{
+			return(false);
+		}
+	}
+	if (Settings.bIsDangerEnabled)
+	{
+		if (!NotInDanger(Position.GetLocation(), Type))
+		{
+			return(false);
+		}
+	}
+	if (Settings.bIsSightEnabled)
+	{
+		// Get Array of View Points
+		TArray<AActor*> ViewPoints;
+		switch (Type)
+		{
+		case EObjectType::Tier1:
+			ViewPoints.Add(PlayerStart);
+		case EObjectType::Tier2:
+			for (AGameObject* Obj : Objects)
+			{
+				if (Obj->Type == EObjectType::Tier1)
+				{
+					ViewPoints.Add(Obj);
+				}
+			}
+		case EObjectType::Tier3:
+			for (AGameObject* Obj : Objects)
+			{
+				if (Obj->Type == EObjectType::Tier2)
+				{
+					ViewPoints.Add(Obj);
+				}
+			}
+		}
+		if (!InSight(Position.GetLocation(), ViewPoints))
+		{
+			return(false);
+		}
+	}
+	if (Settings.bIsNavigationEnabled)
+	{
+		// Get Array of Start Points
+		TArray<AActor*> StartPoints;
+		switch (Type)
+		{
+		case EObjectType::Tier1:
+			StartPoints.Add(PlayerStart);
+		case EObjectType::Tier2:
+			for (AGameObject* Obj : Objects)
+			{
+				if (Obj->Type == EObjectType::Tier1)
+				{
+					StartPoints.Add(Obj);
+				}
+			}
+		case EObjectType::Tier3:
+			for (AGameObject* Obj : Objects)
+			{
+				if (Obj->Type == EObjectType::Tier2)
+				{
+					StartPoints.Add(Obj);
+				}
+			}
+		}
+		if (!IsNavigable(Position.GetLocation(), StartPoints))
+		{
+			return(false);
+		}
+	}
+	// If all contraints are valid
+	return(true);
 }
 
 bool ASpawnArea::InZone(FVector Location, EObjectType Type)
@@ -189,7 +267,7 @@ bool ASpawnArea::IsDistanced(FVector Location)
 {
 	for (AGameObject* Obj : Objects)
 	{
-		if (FVector::Dist(Obj->GetActorLocation(), Location) <= 2500)
+		if (FVector::Dist(Obj->GetActorLocation(), Location) <= Settings.Distance)
 		{
 			return(false);
 		}
@@ -197,7 +275,7 @@ bool ASpawnArea::IsDistanced(FVector Location)
 	return(true);
 }
 
-bool ASpawnArea::InDanger(FVector Location, EObjectType Type)
+bool ASpawnArea::NotInDanger(FVector Location, EObjectType Type)
 {
 	for (ADangerZone* Zone : DangerZones) 
 	{
