@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -277,10 +277,19 @@ bool ASpawnArea::IsDistanced(FVector Location)
 
 bool ASpawnArea::NotInDanger(FVector Location, EObjectType Type)
 {
+	int maxDanger = 0;
+	switch (Type)
+	{
+	case EObjectType::Tier1:
+		maxDanger = 0;
+	case EObjectType::Tier2:
+		maxDanger = 1;
+	case EObjectType::Tier3:
+		maxDanger = 2;
+	}
 	for (ADangerZone* Zone : DangerZones) 
 	{
-		// Check Danger level here
-		if (FVector::Dist(Zone->GetActorLocation(), Location) < Zone->Area->GetScaledSphereRadius())
+		if (FVector::Dist(Zone->GetActorLocation(), Location) < Zone->Area->GetScaledSphereRadius() && Zone->DangerLevel > maxDanger)
 		{
 			return(false);
 		}
