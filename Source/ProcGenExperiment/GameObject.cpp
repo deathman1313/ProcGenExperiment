@@ -20,7 +20,7 @@ AGameObject::AGameObject()
 void AGameObject::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame

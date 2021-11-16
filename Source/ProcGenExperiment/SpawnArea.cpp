@@ -76,6 +76,7 @@ void ASpawnArea::SpawnObjects()
 		// Create Object
 		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
 		NewObj->Type = EObjectType::Tier1;
+		NewObj->Cube->SetMaterial(0, Materials[0]);
 		Objects.Add(NewObj);
 	}
 	for (int i = 0; i < Settings.Tier2Amt; i++)
@@ -97,6 +98,7 @@ void ASpawnArea::SpawnObjects()
 		// Create Object
 		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
 		NewObj->Type = EObjectType::Tier2;
+		NewObj->Cube->SetMaterial(0, Materials[1]);
 		Objects.Add(NewObj);
 	}
 	for (int i = 0; i < Settings.Tier3Amt; i++)
@@ -115,10 +117,17 @@ void ASpawnArea::SpawnObjects()
 				UE_LOG(LogTemp, Warning, TEXT("Borked"));
 			}
 		}
-		// Create Object
-		AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
-		NewObj->Type = EObjectType::Tier3;
-		Objects.Add(NewObj);
+		if (Insurance > Settings.Attempts)
+		{
+		}
+		else
+		{
+			// Create Object
+			AGameObject* NewObj = GetWorld()->SpawnActor<AGameObject>(ObjectToSpawn, Position.GetLocation(), Position.GetRotation().Rotator(), FActorSpawnParameters());
+			NewObj->Type = EObjectType::Tier3;
+			NewObj->Cube->SetMaterial(0, Materials[2]);
+			Objects.Add(NewObj);
+		}
 	}
 }
 

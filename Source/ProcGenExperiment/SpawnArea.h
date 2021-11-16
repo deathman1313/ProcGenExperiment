@@ -100,6 +100,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<ADangerZone*> DangerZones;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<UMaterialInterface*> Materials;
+
 	UFUNCTION(BlueprintCallable)
 		void SetRandomness();
 
